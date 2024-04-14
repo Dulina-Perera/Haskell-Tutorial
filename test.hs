@@ -1,8 +1,16 @@
-main = do
-    let child = "Dudley"
-    let gifts = 36
+child::String
+child = "Dudley"
 
-    putStrLn(child ++ " received " ++ show(gifts) ++ " gifts for his birthday.")
-    putStrLn(show(gifts) ++ " gifts? " ++ child ++ " thought out loud. But last year I had " ++ show(gifts + 1) ++"!")
-    putStrLn("This is when we knew.")
-    putStrLn(child ++ " was a very spoiled child.")
+gifts::Int
+gifts = 36
+
+char::Char
+char = 'a'
+
+gpa::Double
+gpa = 3.5
+
+main = do
+    putStrLn(child ++ " received " ++ show(gifts) ++ " gifts.")
+    print(char)
+    print(gpa)
