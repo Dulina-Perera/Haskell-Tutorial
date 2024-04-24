@@ -6,33 +6,40 @@ import Data.Text.Array (run)
 import System.Process
 import Text.Printf
 
+type Hz = Float
+type Pulse = Float
+type Samples = Float
+type Seconds = Float
+
 outFilePath :: FilePath
 outFilePath = "wave.bin"
+
+audioRate :: Samples
+audioRate = 48000
 
 volume :: Float
 volume = 0.5
 
-sampleCnt :: Float
-sampleCnt = 48000
+freq :: Seconds -> Hz -> [Pulse]
+freq duration frequency = 
+    map (((* volume) . sin) . (* step)) [0..audioRate*duration]
+        where step = (frequency * 2 * pi) / audioRate
 
-wave :: [Float]
-wave = map (((* volume) . sin) . (* step)) [0..sampleCnt]
-    where step = 0.05
+wave :: [Pulse]
+wave = concat [freq 1.0 130.82, freq 1.0 146.83, freq 1.0 164.81, freq 1.0 174.81, freq 1.0 196, freq 1.0 220, freq 1.0 246.94]
 
 save :: FilePath -> [Float] -> IO ()
 save path xs = BL.writeFile path $ BB.toLazyByteString $ foldMap BB.floatLE xs
 
-play :: Float -> IO ProcessHandle
-play audioRate = do
+play :: IO ProcessHandle
+play = do
     save outFilePath wave
 
-    let duration = sampleCnt / audioRate :: Float
-    runCommand $ printf "ffplay -f f32le -ar %.3f %s -nodisp -autoexit -t %.3f" audioRate outFilePath duration
+    runCommand $ printf "ffplay -ar %.3f -autoexit -f f32le -showmode 1 -t 7.0 %s" audioRate outFilePath
 
 main :: IO ()
 main = do
-    let audioRate = 48000 :: Float
-    processHandle <- play audioRate
+    processHandle <- play
     _ <- waitForProcess processHandle
 
     putStrLn "Audio playback completed."
